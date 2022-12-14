@@ -1,22 +1,20 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
-    private static byte[] isComposite;
     private static final int[] bitIndexes= {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
 
         int numberToTest = 100000000;
-        List<Integer> primes = new ArrayList<>();
+        List<Long> primes = new ArrayList<>(numberToTest/10);
 
         int indexOfSquareRoot = findPrimesLessThanNSieve(numberToTest, primes);
         int numberOfTwoFactors = 0;
         for(int i=0;i<=indexOfSquareRoot;i++) {
             for(int j=indexOfSquareRoot+1;j<primes.size();j++) {
-                long testNumber = (long)(primes.get(i)) * (long)(primes.get(j));
+                long testNumber = primes.get(i) * primes.get(j);
                 if(testNumber < numberToTest) {
                     numberOfTwoFactors++;
                 } else {
@@ -24,42 +22,37 @@ public class Main {
                 }
             }
         }
-        long twoFactorCompositesLessThanSqrt = (((indexOfSquareRoot+1) * indexOfSquareRoot)/2L ) + (long)indexOfSquareRoot+1L;
+        long twoFactorCompositesLessThanSqrt = (((indexOfSquareRoot+1) * indexOfSquareRoot)/2L ) + indexOfSquareRoot+1L;
         long finish =System.currentTimeMillis();
         long timeElapsed = finish - start;
         System.out.println(timeElapsed);
         System.out.println("Final count of two factors: " + (numberOfTwoFactors + twoFactorCompositesLessThanSqrt));
     }
 
-    private static int findPrimesLessThanNSieve(int n, List<Integer> retVal) {
-        isComposite = new byte[(n>>4)+1];
-        retVal.add(2);
+    private static int findPrimesLessThanNSieve(int n, List<Long> retVal) {
+        byte[] isComposite = new byte[(n>>4)+1];
+        retVal.add(2L);
         int squareRootIndex = 0;
         int root = (int) Math.sqrt(n);
+        //predeclare loop variables so we don't have them being put on and off of the stack.
+        int i;
+        int j;
+        int k;
+        int kind;
 
-        for(int i=3; i<=n/2; i=i+2) {
-            if(!checkComposite(i)) {
-                retVal.add(i);
+        for(i=3; i<=n/2; i=i+2) {
+            if((isComposite[i>>4] & bitIndexes[(i&0xF)>>1]) == 0) {
+                retVal.add((long)i);
                 if(i<=root) {
                     squareRootIndex++;
                 }
-                for(int j=3;j<=n/i;j=j+2) {
-                    setComposite(j*i);
+                for(j=3;j<=n/i;j=j+2) {
+                    k=j*i;
+                    kind=k>>4;
+                    isComposite[kind]=(byte) (isComposite[kind] | bitIndexes[(k&0xF)>>1]);
                 }
             }
         }
         return squareRootIndex;
-    }
-
-    private static boolean checkComposite(int i) {
-        int index=i>>4;
-        int bitIndex=(i&0xF)>>1;
-        return (isComposite[index] & bitIndexes[bitIndex]) > 0;
-    }
-
-    private static void setComposite(int i) {
-        int index=i>>4;
-        int bitIndex=(i&0xF)>>1;
-        isComposite[index]=(byte) (isComposite[index] | bitIndexes[bitIndex]);
     }
 }
