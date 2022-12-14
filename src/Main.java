@@ -11,7 +11,7 @@ public class Main {
         int indexOfSquareRoot = findPrimesLessThanNSieve(numberToTest, primes);
 
         int numberOfTwoFactors = 0;
-        for(int i=0;i<primes.size();i++) {
+        for(int i=0;i<=indexOfSquareRoot;i++) {
             for(int j=indexOfSquareRoot+1;j<primes.size();j++) {
                 long testNumber = (long)(primes.get(i)) * (long)(primes.get(j));
                 if(testNumber < numberToTest) {
@@ -31,7 +31,7 @@ public class Main {
         int squareRootIndex = -1;
         int root = (int) Math.sqrt( n);
 
-        for(int i=2; i<=n; i++) {
+        for(int i=2; i<=n/2; i++) {
             if(!isComposite[i]) {
                 retVal.add(i);
                 if(i<=root) {
