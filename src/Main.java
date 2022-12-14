@@ -1,16 +1,18 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
-    private static boolean[] isComposite;
+    private static byte[] isComposite;
+    private static final int[] bitIndexes= {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+
     public static void main(String[] args) {
-        long start =System.currentTimeMillis();
+        long start = System.currentTimeMillis();
 
         int numberToTest = 100000000;
         List<Integer> primes = new ArrayList<>();
 
         int indexOfSquareRoot = findPrimesLessThanNSieve(numberToTest, primes);
-
         int numberOfTwoFactors = 0;
         for(int i=0;i<=indexOfSquareRoot;i++) {
             for(int j=indexOfSquareRoot+1;j<primes.size();j++) {
@@ -30,10 +32,10 @@ public class Main {
     }
 
     private static int findPrimesLessThanNSieve(int n, List<Integer> retVal) {
-        isComposite = new boolean[(n/2)+1];
+        isComposite = new byte[(n>>4)+1];
         retVal.add(2);
         int squareRootIndex = 0;
-        int root = (int) Math.sqrt( n);
+        int root = (int) Math.sqrt(n);
 
         for(int i=3; i<=n/2; i=i+2) {
             if(!checkComposite(i)) {
@@ -50,10 +52,14 @@ public class Main {
     }
 
     private static boolean checkComposite(int i) {
-        return isComposite[i>>1];
+        int index=i>>4;
+        int bitIndex=(i&0xF)>>1;
+        return (isComposite[index] & bitIndexes[bitIndex]) > 0;
     }
 
     private static void setComposite(int i) {
-        isComposite[i>>1]=true;
+        int index=i>>4;
+        int bitIndex=(i&0xF)>>1;
+        isComposite[index]=(byte) (isComposite[index] | bitIndexes[bitIndex]);
     }
 }
