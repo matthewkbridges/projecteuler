@@ -1,10 +1,11 @@
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Main {
+    private static boolean[] isComposite;
     public static void main(String[] args) {
-        System.out.println(new Date());
+        long start =System.currentTimeMillis();
+
         int numberToTest = 100000000;
         List<Integer> primes = new ArrayList<>();
 
@@ -22,26 +23,37 @@ public class Main {
             }
         }
         long twoFactorCompositesLessThanSqrt = (((indexOfSquareRoot+1) * indexOfSquareRoot)/2L ) + (long)indexOfSquareRoot+1L;
-        System.out.println(new Date());
+        long finish =System.currentTimeMillis();
+        long timeElapsed = finish - start;
+        System.out.println(timeElapsed);
         System.out.println("Final count of two factors: " + (numberOfTwoFactors + twoFactorCompositesLessThanSqrt));
     }
 
     private static int findPrimesLessThanNSieve(int n, List<Integer> retVal) {
-        boolean[] isComposite = new boolean[n+1];
-        int squareRootIndex = -1;
+        isComposite = new boolean[(n/2)+1];
+        retVal.add(2);
+        int squareRootIndex = 0;
         int root = (int) Math.sqrt( n);
 
-        for(int i=2; i<=n/2; i++) {
-            if(!isComposite[i]) {
+        for(int i=3; i<=n/2; i=i+2) {
+            if(!checkComposite(i)) {
                 retVal.add(i);
                 if(i<=root) {
                     squareRootIndex++;
                 }
-                for(int j=2;j<=n/i;j++) {
-                    isComposite[j*i]=true;
+                for(int j=3;j<=n/i;j=j+2) {
+                    setComposite(j*i);
                 }
             }
         }
         return squareRootIndex;
+    }
+
+    private static boolean checkComposite(int i) {
+        return isComposite[i>>1];
+    }
+
+    private static void setComposite(int i) {
+        isComposite[i>>1]=true;
     }
 }
