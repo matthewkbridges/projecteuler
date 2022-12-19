@@ -8,12 +8,10 @@ public class Main {
         long start = System.currentTimeMillis();
 
         int numberToTest = 100000000;
-        List<Long> primes = new ArrayList<>(numberToTest/10);
-
-        int indexOfSquareRoot = findPrimesLessThanNSieve(numberToTest, primes);
+        List<Long> primes = findPrimesLessThanNSieve(numberToTest);
         int numberOfTwoFactors = 0;
-        for(int i=0;i<=indexOfSquareRoot;i++) {
-            for(int j=indexOfSquareRoot+1;j<primes.size();j++) {
+        for(int i=0;i<primes.size();i++) {
+            for(int j=i;j<primes.size();j++) {
                 long testNumber = primes.get(i) * primes.get(j);
                 if(testNumber < numberToTest) {
                     numberOfTwoFactors++;
@@ -22,19 +20,18 @@ public class Main {
                 }
             }
         }
-        long twoFactorCompositesLessThanSqrt = (((indexOfSquareRoot+1) * indexOfSquareRoot)/2L ) + indexOfSquareRoot+1L;
         long finish =System.currentTimeMillis();
         long timeElapsed = finish - start;
         System.out.println(timeElapsed);
-        System.out.println("Final count of two factors: " + (numberOfTwoFactors + twoFactorCompositesLessThanSqrt));
+        System.out.println("Final count of two factors: " + numberOfTwoFactors);
     }
 
-    private static int findPrimesLessThanNSieve(int n, List<Long> retVal) {
+    private static List<Long> findPrimesLessThanNSieve(int n) {
+        List<Long> retVal = new ArrayList<>(n/10);
         byte[] isComposite = new byte[(n>>4)+1];
         retVal.add(2L);
-        int squareRootIndex = 0;
-        int root = (int) Math.sqrt(n);
-        //predeclare loop variables so we don't have them being put on and off of the stack.
+
+        //predeclare loop variables so that we don't have them being put on and off of the stack.
         int i;
         int j;
         int k;
@@ -43,9 +40,6 @@ public class Main {
         for(i=3; i<=n/2; i=i+2) {
             if((isComposite[i>>4] & bitIndexes[(i&0xF)>>1]) == 0) {
                 retVal.add((long)i);
-                if(i<=root) {
-                    squareRootIndex++;
-                }
                 for(j=3;j<=n/i;j=j+2) {
                     k=j*i;
                     kind=k>>4;
@@ -53,6 +47,6 @@ public class Main {
                 }
             }
         }
-        return squareRootIndex;
+        return retVal;
     }
 }
